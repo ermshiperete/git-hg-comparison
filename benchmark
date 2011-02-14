@@ -1,0 +1,60 @@
+#!/bin/bash
+
+DVCS=$1
+BMDIR=$(pwd)
+OUTPUT=$BMDIR/$DVCS"results.out"
+DVCSDIR=$DVCS"repo"
+DVCSFULLDIR=$BMDIR/$DVCSDIR
+
+function log0
+{
+	echo $* | tee -a $OUTPUT
+}
+
+function log
+{
+	log0 $*
+	log0 ""
+}
+
+function benchmark
+{
+	log0 "$@"
+	/usr/bin/time --output=$OUTPUT --append "$@"
+	du -s -h $DVCSFULLDIR >> $OUTPUT
+	log0 ""
+}
+
+rm -rf $DVCSDIR
+rm $OUTPUT
+log0 "Benchmarking $DVCS"
+log  "=================="
+log0 "System:"
+log "$(uname -a)"
+log0 "Memory:"
+log "$(free)"
+log "DVCS: $($DVCS --version)"
+log "Initializing repo"
+benchmark $DVCS init $DVCSDIR
+cd $DVCSDIR
+
+log "Add and commit one file"
+echo A > file.txt
+benchmark $DVCS add file.txt
+benchmark $DVCS commit -m "\"commit message\""
+
+log "Add and modify same file, 5 modifications with 100 lines"
+benchmark $BMDIR/filetest $DVCS 5 100
+
+log "Add and modify same file, 100 modifications with 100 lines"
+benchmark $BMDIR/filetest $DVCS 100 100
+
+log "Add and modify same file, 50 modifications with 10000 lines"
+benchmark $BMDIR/filetest $DVCS 50 10000
+
+log "Add and modify same file, 200 modifications with 10000 lines"
+benchmark $BMDIR/filetest $DVCS 200 10000
+
+log "Get entire log"
+benchmark $DVCS log > /dev/null
+

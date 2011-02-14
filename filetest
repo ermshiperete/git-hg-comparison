@@ -1,0 +1,17 @@
+#!/bin/bash
+# Modify a file, add it to dvcs and commit
+DVCS=$1
+MODS=$2
+LINES=$3
+FILENAME=file.txt
+for ((i = 0; i < $MODS; i++)); do
+	echo "" > $FILENAME
+	for ((j = 0; j < $LINES; j++)); do
+		echo $i >> $FILENAME
+	done
+	if [ "$DVCS" == "git" ]; then 
+		$DVCS add $FILENAME
+	fi
+	$DVCS commit -m "Commiting $i"
+done
+

@@ -1,4 +1,4 @@
-# compile with: g++ createfile.cpp -o createfile
+// compile with: g++ createfile.cpp -o createfile
 #include <iostream>
 #include <string>
 #include <fstream>

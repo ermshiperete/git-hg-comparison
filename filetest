@@ -5,13 +5,11 @@ MODS=$2
 LINES=$3
 FILENAME=file.txt
 for ((i = 0; i < $MODS; i++)); do
-	echo "" > $FILENAME
-	for ((j = 0; j < $LINES; j++)); do
-		echo $i >> $FILENAME
-	done
+	createfile $FILENAME $i $LINES
 	if [ "$DVCS" == "git" ]; then 
 		$DVCS add $FILENAME
 	fi
-	$DVCS commit -m "Commiting $i"
+	echo "Committing $i/$MODS"
+	$DVCS commit -m "Committing $i"
 done
 

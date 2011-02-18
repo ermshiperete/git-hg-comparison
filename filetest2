@@ -1,0 +1,19 @@
+#!/bin/bash
+# Modify a $NFILES files, add it to dvcs and commit
+DVCS=$1
+TEST=$2
+MODS=$3
+NFILES=$4
+LINES=$5
+FILENAME=file$TEST_
+for ((i = 0; i < $MODS; i++)); do
+	for ((j = 0; j < $NFILES; j++)); do
+		createfile $FILENAME$j $i$j $LINES
+		if [ "$DVCS" == "git" ] || [ $i = 0 ]; then 
+			$DVCS add $FILENAME$j
+		fi
+	done
+	echo "Committing multi file modification $i/$MODS"
+	$DVCS commit -m "Committing multi file modification $i"
+done
+

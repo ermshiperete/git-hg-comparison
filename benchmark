@@ -5,6 +5,7 @@ BMDIR=$(pwd)
 OUTPUT=$BMDIR/$DVCS"results.out"
 DVCSDIR=$DVCS"repo"
 DVCSFULLDIR=$BMDIR/$DVCSDIR
+PATH=$BMDIR:$PATH
 
 function log0
 {
@@ -24,6 +25,14 @@ function benchmark
 	du -s -h $DVCSFULLDIR >> $OUTPUT
 	log0 ""
 }
+
+function usage
+{
+	echo "Usage:"
+	echo "$0 [hg|git]"
+}
+
+[ -z "$1" ] && usage && exit 0
 
 rm -rf $DVCSDIR
 rm $OUTPUT
@@ -55,6 +64,23 @@ benchmark $BMDIR/filetest $DVCS 50 10000
 log "Add and modify same file, 200 modifications with 10000 lines"
 benchmark $BMDIR/filetest $DVCS 200 10000
 
+log "Add and modify 10 files, 5 modifications with 100 lines"
+benchmark $BMDIR/filetest2 $DVCS 1 5 10 100
+
+log "Add and modify 100 files, 5 modifications with 100 lines"
+benchmark $BMDIR/filetest2 $DVCS 2 5 100 100
+
+log "Add and modify 10 files, 200 modifications with 100 lines"
+benchmark $BMDIR/filetest2 $DVCS 3 200 10 100
+
+log "Add and modify 10 files, 5 modifications with 10000 lines"
+benchmark $BMDIR/filetest2 $DVCS 4 5 10 10000
+
 log "Get entire log"
 benchmark $DVCS log > /dev/null
+
+if [ "$DVCS" == "git" ]; then
+	log "Garbage collecting"
+	benchmark git gc
+fi
 
